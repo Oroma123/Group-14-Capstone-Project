@@ -8,11 +8,39 @@
 
     document.getElementById('loginForm').addEventListener('submit',e=>{
       e.preventDefault();
-      const email=document.getElementById('email').value.trim();
-      const pass=document.getElementById('password').value.trim();
-      if(email===''||pass===''){alert('Please fill in all fields');}
-      else{
-        alert('Login successful!');
-        window.location.href="indexx.html"; // redirect
-      }
+      handleLogin();
     });
+
+async function handleLogin(){
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  if(email === ''||password === ''){
+    alert('Please fill in all fields');
+    return;
+  } else{
+    try{
+      const response = await fetch('https://gbese-6f0j.onrender.com/api/login',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({
+          email:email, password:password
+        })
+      });
+      const data = await response.json();
+      if(response.ok){
+        accessToken = data.accessToken;
+        localStorage.setItem('accessToken', accessToken);
+        //loginMsg.textContent='Login successful!';
+        window.location.href="Dashboard.html";
+      } else{
+        //loginMsg.textContent=data.message ||'Login failed. Please try again.';
+        console.log('Login failed:',data);
+      }
+    } catch(error){
+      console.error('Error during login:',error);
+      //loginMsg.textContent = 'An error occurred. Please try again later.';
+    }
+  }
+}
